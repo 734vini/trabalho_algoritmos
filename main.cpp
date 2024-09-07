@@ -12,13 +12,15 @@ struct Produto {
     string nome;
     int quantidade;
     float valor;
+    string unidadeMedida;
     string dataCriacao;
     string horaCriacao;
 
-    Produto(string nome, int quantidade, float valor) {
+    Produto(string nome, int quantidade, float valor, string unidadeMedida) {
         this->nome = nome;
         this->quantidade = quantidade;
         this->valor = valor;
+        this->unidadeMedida = unidadeMedida;
 
         // Obtém o tempo atual em segundos desde o "Epoch" e converte para uma struct tm
         time_t tempo = time(nullptr);
@@ -33,7 +35,6 @@ struct Produto {
         dataCriacao = ossData.str();
         horaCriacao = ossHora.str();
     }
-
 };
 
 vector<Produto> produtos;
@@ -55,6 +56,7 @@ void CadastrarProduto() {
     string nomeDigitado;
     int quantidadeDigitada;
     float valorDigitado;
+    string medidaDigitada;
 
     cout << "--- Cadastro de produtos ---\n";
     cout << "\nDigite o nome do produto: ";
@@ -72,11 +74,36 @@ void CadastrarProduto() {
             VoltarMenu();
         }
     }
-    cout << "Digite a quantidade recebida: ";
-    cin >> quantidadeDigitada;
-    cout << "Digite o valor de venda: ";
-    cin >> valorDigitado;
-    Produto novoProduto(nomeDigitado, quantidadeDigitada, valorDigitado);
+    do {
+        cout << "Digite a unidade de medida (KG ou UN - Unitário): ";
+        cin >> medidaDigitada;
+        for (auto &c : medidaDigitada) c = toupper(c); // Converte para maiúsculo
+        if (medidaDigitada != "KG" && medidaDigitada != "UN") {
+            cout << "Unidade inválida! Digite apenas KG ou UN." << endl;
+        }
+    } while (medidaDigitada != "KG" && medidaDigitada != "UN");
+
+    // Validação da quantidade recebida (maior que 0)
+    do {
+        cout << "Digite a quantidade recebida: ";
+        cin >> quantidadeDigitada;
+        if (quantidadeDigitada <= 0) {
+            cout << "Quantidade inválida! Deve ser maior que 0." << endl;
+        }
+    } while (quantidadeDigitada <= 0);
+
+    // Validação do valor de venda (maior que 0)
+    do {
+        cout << "Digite o valor de venda: ";
+        cin >> valorDigitado;
+        if (valorDigitado <= 0) {
+            cout << "Valor inválido! Deve ser maior que 0." << endl;
+        }
+    } while (valorDigitado <= 0);
+
+    cout << "Unidade: " << medidaDigitada << ", Quantidade: " << quantidadeDigitada << ", Valor de venda: " << valorDigitado << endl;
+
+    Produto novoProduto(nomeDigitado, quantidadeDigitada, valorDigitado, medidaDigitada);
     produtos.push_back(novoProduto);
     cout << "\nProduto cadastrado com sucesso!\n";
     VoltarMenu();
@@ -90,13 +117,12 @@ void VenderProduto() {
 void ListarProdutos() {
     LimparConsole();
     cout << "--- Listar Produtos ---\n";
-    for (int i = 0; i < produtos.size(); i++) {
-        cout << "Nome: " << produtos[i].nome 
-             << ", Quantidade: " << produtos[i].quantidade 
-             << ", Valor: R$" << produtos[i].valor 
-             << ", Data de Criação: " << produtos[i].dataCriacao 
-             << ", Hora de Criação: " << produtos[i].horaCriacao 
-             << endl;
+    cout << left << setw(20) << "Nome" << setw(10) << "Qtd." << setw(10) << "Preço" << setw(10) << "Unidade de Medida" << endl;
+    cout << "----------------------------------------------------" << endl;
+    for (int i = 0; i < produtos.size() ; ++i) {
+        if (produtos[i].quantidade != 0) {
+        cout << left << setw(20) << produtos[i].nome << setw(10) << produtos[i].quantidade << setw(10) << produtos[i].valor << setw(10) << produtos[i].unidadeMedida << endl;
+        }
     }
     VoltarMenu();
 }
