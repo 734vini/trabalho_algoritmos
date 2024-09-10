@@ -48,6 +48,7 @@ void MenuPrincipal(); // Declaração antecipada devido ao escopo
 void VoltarMenu() {
     cout << "\nPressione qualquer tecla para voltar ao menu inicial...";
     system("pause > nul");
+    LimparConsole();
     MenuPrincipal();
 }
 
@@ -61,15 +62,27 @@ void CadastrarProduto() {
     cout << "--- Cadastro de produtos ---\n";
     cout << "\nDigite o nome do produto: ";
     cin >> nomeDigitado;
+    for (auto &c : nomeDigitado) c = toupper(c);
     for(size_t i = 0; i < produtos.size(); i++) {
         if(nomeDigitado == produtos[i].nome){
             cout << "\nProduto \"" << produtos[i].nome <<"\" já cadastrado.\n";
-            cout << "Digite a quantidade recebida: ";
-            cin >> quantidadeDigitada;
-            produtos[i].quantidade += quantidadeDigitada;
-            cout << "Digite o valor de venda: ";
-            cin >> valorDigitado;
-            produtos[i].valor = valorDigitado;
+            // Validação da quantidade recebida (maior que 0)
+            do {
+                cout << "Digite a quantidade recebida (em " << produtos[i].unidadeMedida << "): ";
+                cin >> quantidadeDigitada;
+                if (quantidadeDigitada <= 0) {
+                    cout << "Quantidade inválida! Deve ser maior que 0." << endl;
+                }
+            } while (quantidadeDigitada <= 0);
+
+            // Validação do valor de venda (maior que 0)
+            do {
+                cout << "Digite o valor de venda (por " << produtos[i].unidadeMedida << "): "; 
+                cin >> valorDigitado;
+                if (valorDigitado <= 0) {
+                    cout << "Valor inválido! Deve ser maior que 0." << endl;
+                }
+            } while (valorDigitado <= 0);
             cout << "\nProduto cadastrado com sucesso!\n";
             VoltarMenu();
         }
@@ -85,7 +98,7 @@ void CadastrarProduto() {
 
     // Validação da quantidade recebida (maior que 0)
     do {
-        cout << "Digite a quantidade recebida: ";
+        cout << "Digite a quantidade recebida (em " << medidaDigitada << "): ";
         cin >> quantidadeDigitada;
         if (quantidadeDigitada <= 0) {
             cout << "Quantidade inválida! Deve ser maior que 0." << endl;
@@ -94,14 +107,12 @@ void CadastrarProduto() {
 
     // Validação do valor de venda (maior que 0)
     do {
-        cout << "Digite o valor de venda: ";
+        cout << "Digite o valor de venda (por " << medidaDigitada << "): "; 
         cin >> valorDigitado;
         if (valorDigitado <= 0) {
             cout << "Valor inválido! Deve ser maior que 0." << endl;
         }
     } while (valorDigitado <= 0);
-
-    cout << "Unidade: " << medidaDigitada << ", Quantidade: " << quantidadeDigitada << ", Valor de venda: " << valorDigitado << endl;
 
     Produto novoProduto(nomeDigitado, quantidadeDigitada, valorDigitado, medidaDigitada);
     produtos.push_back(novoProduto);
@@ -117,7 +128,7 @@ void VenderProduto() {
 void ListarProdutos() {
     LimparConsole();
     cout << "--- Listar Produtos ---\n";
-    cout << left << setw(20) << "Nome" << setw(10) << "Qtd." << setw(10) << "Preço" << setw(10) << "Unidade de Medida" << endl;
+    cout << left << setw(20) << "Nome" << setw(10) << "Qtd." << setw(10) << "Preço" << setw(10) << "Medida" << endl;
     cout << "----------------------------------------------------" << endl;
     for (int i = 0; i < produtos.size() ; ++i) {
         if (produtos[i].quantidade != 0) {
@@ -133,9 +144,8 @@ void EncerrarExpediente() {
 }
 
 void MenuPrincipal() {
-    LimparConsole();
     int escolha;
-    bool escolhaValida = true;
+
     cout << "--- Sistema de Supermercados ---\n";
     cout << "\n[1] Cadastrar Produto";
     cout << "\n[2] Vender Produto";
@@ -144,7 +154,13 @@ void MenuPrincipal() {
     cout << "\nDigite a opção desejada: ";
 
     do {
-        cin >> escolha;
+        if (!(cin >> escolha)) { // Verifica se a entrada for inválida
+            cin.clear(); // Limpa o erro
+            cin.ignore(1000, '\n'); // Ignora a entrada inválida
+            cout << "Opção inválida digite novamente: ";
+            continue;             // Continua o loop sem parar
+        }
+
         switch (escolha) {
             case 1:
                 CadastrarProduto();
@@ -160,10 +176,9 @@ void MenuPrincipal() {
                 break;
             default:
                 cout << "Opção inválida digite novamente: ";
-                escolhaValida = false;
                 break;
         }
-    } while (!escolhaValida);
+    } while (true); // O loop continua indefinidamente até que seja encerrado pela função
 }
 
 int main() {
