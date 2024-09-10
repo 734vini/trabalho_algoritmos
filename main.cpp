@@ -11,7 +11,7 @@ using namespace std;
 
 struct Produto {
     string nome;
-    int quantidade;
+    float quantidade;
     float valor;
     string unidadeMedida;
     string dataCriacao;
@@ -19,7 +19,7 @@ struct Produto {
 
     Produto() {} // construtor vazio
 
-    Produto(string nome, int quantidade, float valor, string unidadeMedida) {
+    Produto(string nome, float quantidade, float valor, string unidadeMedida) {
         this->nome = nome;
         this->quantidade = quantidade;
         this->valor = valor;
@@ -89,7 +89,7 @@ void VoltarMenu() {
 void CadastrarProduto() {
     LimparConsole();
     string nomeDigitado;
-    int quantidadeDigitada;
+    float quantidadeDigitada;
     float valorDigitado;
     string medidaDigitada;
 
@@ -163,11 +163,11 @@ void VenderProduto() {
 
 void ListarProdutos() {
     LimparConsole();
-    cout << "--- Listar Produtos ---\n";
-    cout << left << setw(20) << "Nome" << setw(10) << "Qtd." << setw(10) << "Preço" << setw(10) << "Medida" <<  setw(20) << "Data/Hora Criação" << endl;
+    cout << "--- Listar Produtos ---\n" << endl;
+    cout << left << setw(20) << "Nome" << setw(10) << "Qtd." << setw(10) << "Medida" << setw(10) << "Preço" <<  setw(20) << "Data/Hora Criação" << endl;
     cout << "----------------------------------------------------------------------------" << endl;
     for (int i = 0; i < produtos.size() ; ++i) {
-        cout << left << setw(20) << produtos[i].nome << setw(10) << produtos[i].quantidade << setw(10) << produtos[i].valor << setw(10) << produtos[i].unidadeMedida <<  setw(20) << produtos[i].dataCriacao + " às " + produtos[i].horaCriacao << endl;
+        cout << left << setw(20) << produtos[i].nome << setw(10) << produtos[i].quantidade << setw(10) << produtos[i].unidadeMedida << setw(10) << produtos[i].valor <<  setw(20) << produtos[i].dataCriacao + " às " + produtos[i].horaCriacao << endl;
     }
     VoltarMenu();
 }
