@@ -96,7 +96,7 @@ void CadastrarProduto() {
     cout << "--- Cadastro de produtos ---\n";
     cout << "\nDigite o nome do produto: ";
     cin >> nomeDigitado;
-    for (auto &c : nomeDigitado) c = toupper(c);
+    for (auto &c : nomeDigitado) c = toupper(c); // transforma todas as letras em maúsculo
     for(size_t i = 0; i < produtos.size(); i++) {
         if(nomeDigitado == produtos[i].nome){
             cout << "\nProduto \"" << produtos[i].nome <<"\" já cadastrado.\n";
@@ -158,7 +158,63 @@ void CadastrarProduto() {
 
 void VenderProduto() {
     LimparConsole();
-    cout << "Teste";
+    string nomeDigitado;
+    int opcaoEscolha;
+    int numParcelas;
+    float quantidadeDigitada;
+    float valorTotal = 0;
+
+    cout << "--- Venda de produtos ---\n";
+    do {
+        cout << "\nDigite o nome do produto: ";
+        cin >> nomeDigitado;
+        for (auto &c : nomeDigitado) c = toupper(c); // transforma todas as letras em maúsculo
+        for (size_t i = 0; i < produtos.size(); i++) {
+            if (nomeDigitado == produtos[i].nome) {
+                string textoParenteses;
+                produtos[i].unidadeMedida == "UN" ? textoParenteses = "(por unidade): " : textoParenteses = "(em quilogramas): ";
+                do {
+                    cout << "Digite a quantidade " << textoParenteses; 
+                    cin >> quantidadeDigitada;
+                    if (quantidadeDigitada <= 0) {
+                    cout << "Valor inválido! Deve ser maior que 0." << endl;
+                    }
+                    else if (quantidadeDigitada > produtos[i].quantidade) {
+                        cout << "Quantidade em estoque insuficiente." << endl;
+                        cout << "Saldo do produto: " << produtos[i].quantidade; 
+                    }
+                    valorTotal = valorTotal + (quantidadeDigitada * produtos[i].valor);
+                } while (quantidadeDigitada <= 0 || quantidadeDigitada > produtos[i].quantidade);
+            }
+        }
+        cout << "\n[1] Finalizar venda";
+        cout << "\n[2] Continuar vendendo\n";
+        cout << "\nDigite a opção desejada: ";
+
+        switch (opcaoEscolha) {
+            case 1:
+                cout << "Valor total da venda: R$ " << valorTotal << endl;
+                cout << "\nÀ vista (1 parcela) \t5% de desconto";
+                cout << "\nEm até 3x \tsem juros";
+                cout << "\nEm até 12x \t10% de juros\n";
+                do {
+                    cout << "\nDigite a quatidade de parcelas: ";
+                    cin >> numParcelas;
+                    if (numParcelas == 1) {
+                        cout << "Valor a pagar: R$ " << valorTotal - (valorTotal * 0.5);
+                    }
+                    else if (numParcelas > 1 && numParcelas <= 12) {
+                        // array que mostre as parcelas e veja se é ate 3 ou até 12
+                    }
+                    else {
+                        cout << "Número de parcelas inválido. Tente novamente.";
+                    }
+                } while (numParcelas == 0 && numParcelas > 12);
+                
+        }
+
+
+    } while (opcaoEscolha != 1);
 }
 
 void ListarProdutos() {
