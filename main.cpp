@@ -30,12 +30,12 @@ struct Produto {
         time_t tempo = time(nullptr);
         tm* tempoAtual = localtime(&tempo);
 
-        // usa ostringstream para capturar a data e a hora formatadas
+        // usa ostringstream para pegar a data e a hora formatadas
         ostringstream ossData, ossHora;
         ossData << put_time(tempoAtual, "%d/%m/%Y");
         ossHora << put_time(tempoAtual, "%H:%M");
 
-        // armazena as strings formatadas nas variaveis correspondentes
+        // armazena as strings formatadas nas variaveis
         dataCriacao = ossData.str();
         horaCriacao = ossHora.str();
     }
@@ -226,6 +226,7 @@ void VenderProduto() {
     float quantidadeDigitada;
     float valorTotal = 0;
     float valorParcelas;
+    bool produtoExistente = false;
 
     cout << "--- Venda de produtos ---\n";
     do {
@@ -234,8 +235,13 @@ void VenderProduto() {
         for (auto &c : nomeDigitado) c = toupper(c); // transforma todas as letras em maiusculo
         for (size_t i = 0; i < produtos.size(); i++) {
             if (nomeDigitado == produtos[i].nome) {
+                produtoExistente = true;
                 string textoParenteses;
-                produtos[i].unidadeMedida == "UN" ? textoParenteses = "(por unidade): " : textoParenteses = "(em quilogramas): ";
+                if (produtos[i].unidadeMedida == "UN") {
+                    textoParenteses = "(por unidade): ";
+                } else if (produtos[i].unidadeMedida == "KG") {
+                    textoParenteses = "(em quilogramas): ";
+                }
                 do {
                     cout << "Digite a quantidade " << textoParenteses; 
                     cin >> quantidadeDigitada;
@@ -255,10 +261,14 @@ void VenderProduto() {
                         cout << "Quantidade em estoque insuficiente." << endl;
                         cout << "Saldo do produto: " << produtos[i].quantidade << endl; 
                     }
-                    produtos[i].quantidade -= quantidadeDigitada;
-                    valorTotal = valorTotal + (quantidadeDigitada * produtos[i].valor);
                 } while (quantidadeDigitada <= 0 || quantidadeDigitada > produtos[i].quantidade);
+                produtos[i].quantidade -= quantidadeDigitada;
+                valorTotal = valorTotal + (quantidadeDigitada * produtos[i].valor);
             }
+        }
+        if (!produtoExistente) {
+            cout << "\nProduto nao encontrado, tente novamente.";
+            continue;
         }
         cout << "\n[1] Finalizar venda";
         cout << "\n[2] Continuar vendendo\n";
@@ -280,9 +290,14 @@ void VenderProduto() {
 
         } while (opcaoEscolha != 1 && opcaoEscolha != 2);
 
+        // pega a data atual do sistema
+        time_t tempo = std::time(nullptr);
+        tm* dataAtual = std::localtime(&tempo);
+
         switch (opcaoEscolha) {
             case 1:
-                cout << "Valor total da venda: R$ " << valorTotal << endl;
+                cout << fixed <<  setprecision(2);  // faz exibir apenas duas casas decimais
+                cout << "\nValor total da venda: R$ " << valorTotal << endl;
                 cout << "\nA vista (1 parcela) \t5% de desconto";
                 cout << "\nEm ate 3x \t\tsem juros";
                 cout << "\nEm ate 12x \t\t10% de juros\n";
@@ -299,24 +314,31 @@ void VenderProduto() {
                     }
 
                     if (numParcelas == 1) {
+                        cout << fixed <<  setprecision(2);  // faz exibir apenas duas casas decimais
                         cout << "Valor a pagar: R$ " << valorTotal - (valorTotal * 0.05);
                         VoltarMenu();
                     }
                     else if (numParcelas > 1 && numParcelas <= 12) {
                         if (numParcelas == 2 || numParcelas == 3) {
                             valorParcelas = valorTotal / numParcelas;
-                            cout << "\nParcelas a pagar: \n";
+                            cout << "\nParcelas a pagar: \n" << endl;
                             for (int i = 1; i <= numParcelas; i++) {
-                                cout << i << "ª Parcela: R$" << valorParcelas << " - Vencimento: xx/xx/xxxx\n";
+                                dataAtual->tm_mday += 30; // adiciona mais 30 dias na data atual
+                                std::mktime(dataAtual); // muda o mes ou ano
+                                cout << fixed <<  setprecision(2);  // faz exibir apenas duas casas decimais
+                                cout << i << "a Parcela: R$" << valorParcelas << " - Vencimento: " << put_time(dataAtual, "%d/%m/%Y") << "\n";
                             }
                             VoltarMenu();
                         }
                         if (numParcelas > 3 || numParcelas < 13) {
                             valorTotal = valorTotal * 1.1;
                             valorParcelas = valorTotal / numParcelas;
-                            cout << "\nParcelas a pagar: ";
+                            cout << "\nParcelas a pagar: \n" << endl;
                             for (int i = 1; i <= numParcelas; i++) {
-                                cout << i << "ª Parcela: R$" << valorParcelas << " - Vencimento: xx/xx/xxxx\n";
+                                dataAtual->tm_mday += 30; // adiciona mais 30 dias na data atual
+                                std::mktime(dataAtual); // muda o mes ou ano
+                                cout << fixed <<  setprecision(2);  // faz exibir apenas duas casas decimais
+                                cout << i << "a Parcela: R$" << valorParcelas << " - Vencimento: " << put_time(dataAtual, "%d/%m/%Y") << "\n";
                             }
                             VoltarMenu();
                         }
@@ -349,6 +371,7 @@ void EncerrarExpediente() {
 }
 
 void MenuPrincipal() {
+    LimparConsole();
     int escolha;
 
     cout << "--- Sistema de Supermercados ---\n";
