@@ -367,8 +367,10 @@ void ListarProdutos() {
 
 void EncerrarExpediente() {
     LimparConsole();
-    cout << "Teste";
-}
+    cout << "Expediente encerrado, pressione qualquer tecla para sair...";
+    system("pause > nul");
+    exit(0);
+    }
 
 void MenuPrincipal() {
     LimparConsole();
